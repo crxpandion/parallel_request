@@ -68,6 +68,7 @@ func (f *Fetcher) waitAndCleanup(doneChan chan struct{}) {
 }
 
 // Listen validates the results and initiates shutdown if there is a valid result.
+// If no valid result is found it emits the last failing result.
 func (f *Fetcher) Listen() {
 	var lastResult *Result
 	for r := range f.resultChan {
