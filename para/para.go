@@ -25,7 +25,7 @@ func NewFetcher() *Fetcher {
 		cleanupWaiting: sync.Once{},
 		initClose:      sync.Once{},
 		closeChan:      make(chan struct{}),
-		resultChan:     make(chan *Result, 10),
+		resultChan:     make(chan *Result, 1),
 
 		Get:  make(chan *Result),
 		Done: make(chan struct{}),
@@ -48,11 +48,10 @@ func (f *Fetcher) Fetch(worker func() (string, error)) {
 		select {
 		case <-f.closeChan:
 			f.wg.Done()
-		default:
-			f.resultChan <- &Result{
-				err:      e,
-				response: r,
-			}
+		case f.resultChan <- &Result{
+			err:      e,
+			response: r,
+		}:
 		}
 	}(worker)
 }
